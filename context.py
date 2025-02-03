@@ -49,7 +49,10 @@ class State:
 
 
 class FSM:
-    '''Finite State Machine'''
+    '''Finite State Machine
+    
+    Sets rules for state transitions depending on the context.
+    '''
 
     def __init__(
         self,
@@ -104,7 +107,7 @@ class FSMHandler:
 
     def handle(self, user: int | str | tuple, *args, **kwargs) -> Any:
         cur_state = self.interlayer.get_state(user)
-        if not cur_state.exec_condition(*args, **kwargs):
+        if not cur_state.entering_condition(*args, **kwargs):
             return
 
         res = cur_state.action(*args, **kwargs)
@@ -118,12 +121,12 @@ class FSMHandler:
     async def async_handle(self, user: int | str | tuple, *args, **kwargs) -> Any:
         cur_state: State = await self.interlayer.get_state(user)
 
-        if not await cur_state.exec_condition(*args, **kwargs):
+        if not await cur_state.entering_condition(*args, **kwargs):
             return
 
         res = await cur_state.action(*args, **kwargs)
         if await cur_state.transition_condition(*args, **kwargs):
-            context = cur_state.getcontext(*args, **kwargs)
+            context = await cur_state.getcontext(*args, **kwargs)
             new_state = self.machine.getnextstate(cur_state.name, context)
             await self.interlayer.set_state(new_state)
 
