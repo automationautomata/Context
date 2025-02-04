@@ -11,6 +11,13 @@ def pipeline(middlewares: list):
     return wrapper
 
 
+def constant(data):
+    def wrapper(*args, **kwargs):
+        return data
+
+    return wrapper
+
+
 def counter(func, num, action_func=None):
     cnt = 0
 
